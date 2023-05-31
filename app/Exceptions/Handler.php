@@ -5,6 +5,8 @@ namespace App\Exceptions;
 use Throwable;
 use App\Libraries\ResponseBase;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -35,18 +37,20 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        $this->reportable(function (Throwable $e) {
-            //
-        });
-    }
-
-    public function render($request, Throwable $e)
-    {
-        if ($this->isHttpException($e)) {
-            if ($e->getStatusCode() == 405) {
-                return ResponseBase::error("Maaf, Endpoint (POST | PUT | PATCH | DELETE) tidak tersedia", 405);
+        $this->renderable(function (Throwable $e) {
+            if ($e instanceof NotFoundHttpException && str_contains($e->getMessage(), 'model')) {
+                $firstIndex = strpos($e->getMessage(), "Models\\") + 7;
+                $lastIndex = strpos($e->getMessage(), "]");
+                $model = substr($e->getMessage(), $firstIndex, $lastIndex - $firstIndex);
+                
+                return ResponseBase::error("Id $model tidak ditemukan", 409);
+            } else if ($e instanceof NotFoundHttpException) {
+                return ResponseBase::error('Url tidak ditemukan', 404);
+            } else if ($e instanceof MethodNotAllowedHttpException) {
+                return ResponseBase::error('Method tidak diizinkan', 405);
+            } else {
+                return ResponseBase::error('Internal server error', 500);
             }
-        }
-        return parent::render($request, $e);
+        });
     }
 }
