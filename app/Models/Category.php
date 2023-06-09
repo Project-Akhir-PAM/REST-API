@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
-use App\Models\Product;
+use App\Models\Destination;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -13,9 +13,9 @@ class Category extends Model
 
     protected $guarded = ['id'];
 
-    public function products()
+    public function destinations()
     {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(Destination::class);
     }
 
     public function scopeSearch($query, $search)

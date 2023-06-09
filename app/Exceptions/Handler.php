@@ -4,6 +4,8 @@ namespace App\Exceptions;
 
 use Throwable;
 use App\Libraries\ResponseBase;
+use Illuminate\Support\Facades\App;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
@@ -44,6 +46,8 @@ class Handler extends ExceptionHandler
                 $model = substr($e->getMessage(), $firstIndex, $lastIndex - $firstIndex);
                 
                 return ResponseBase::error("Id $model tidak ditemukan", 409);
+            } else if ($e instanceof ModelNotFoundException) {
+                return ResponseBase::error('Data tidak ditemukan', 404);
             } else if ($e instanceof NotFoundHttpException) {
                 return ResponseBase::error('Url tidak ditemukan', 404);
             } else if ($e instanceof MethodNotAllowedHttpException) {

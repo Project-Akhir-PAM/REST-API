@@ -7,7 +7,7 @@ use App\Models\Category;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Product extends Model
+class Destination extends Model
 {
     use HasFactory;
 
@@ -27,9 +27,9 @@ class Product extends Model
         });
     }
 
-    public function getImgUrlAttribute()
+    public function getImgAttribute()
     {
-        return asset('storage/' . $this->img);
+        return asset('storage/' . $this->attributes['img']);
     }
 
     public function getCreatedAtAttribute()

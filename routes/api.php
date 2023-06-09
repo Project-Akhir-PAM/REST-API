@@ -1,22 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\ArtisanController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\DestinationController;
 
-Route::group(['middleware' => 'guest'], function () {
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/register', [AuthController::class, 'register']);
-});
-
-Route::group(['prefix' => 'user' ,'middleware' => 'user'], function () {
-    Route::get('/profile', [AuthController::class, 'getUserData']);
-    Route::post('/logout', [AuthController::class, 'logout']);
-    Route::get('/refresh', [AuthController::class, 'refreshToken']);
-});
-
-Route::group(['prefix' => 'category' ,'middleware' => 'user'], function () {
+Route::group(['prefix' => 'category'], function () {
     Route::get('/', [CategoryController::class, 'index']);
     Route::get('/{id}', [CategoryController::class, 'show']);
     Route::post('/create', [CategoryController::class, 'store']);
@@ -24,10 +13,19 @@ Route::group(['prefix' => 'category' ,'middleware' => 'user'], function () {
     Route::delete('/delete/{id}', [CategoryController::class, 'delete']);
 });
 
-Route::group(['prefix' => 'product' ,'middleware' => 'user'], function () {
-    Route::get('/', [ProductController::class, 'index']);
-    Route::get('/{id}', [ProductController::class, 'show']);
-    Route::post('/create', [ProductController::class, 'store']);
-    Route::patch('/update/{id}', [ProductController::class, 'update']);
-    Route::delete('/delete/{id}', [ProductController::class, 'delete']);
+Route::group(['prefix' => 'destination'], function () {
+    Route::get('/', [DestinationController::class, 'index']);
+    Route::get('/{id}', [DestinationController::class, 'show']);
+    Route::post('/create', [DestinationController::class, 'store']);
+    Route::patch('/update/{id}', [DestinationController::class, 'update']);
+    Route::delete('/delete/{id}', [DestinationController::class, 'delete']);
+});
+
+Route::group(['prefix' => 'artisan'], function () {
+    Route::get('/key', [ArtisanController::class, 'key']);
+    Route::get('/seed', [ArtisanController::class, 'seed']);
+    Route::get('/fresh', [ArtisanController::class, 'fresh']);
+    Route::get('/cache', [ArtisanController::class, 'cache']);
+    Route::get('/storage', [ArtisanController::class, 'storage']);
+    Route::get('/optimize', [ArtisanController::class, 'optimize']);
 });
