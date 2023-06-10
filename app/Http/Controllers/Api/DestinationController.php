@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Destination;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Libraries\ResponseBase;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class DestinationController extends Controller
@@ -34,7 +36,7 @@ class DestinationController extends Controller
     {
         $rules = [
             'name' => 'required|string|max:255|unique:destinations,name,NULL,id,category_id,' . $request->category_id,
-            'img' => 'required|string',
+            'img' => 'required|image',
             'location' => 'required|string',
             'description' => 'required|string',
             'category_id' => 'required|numeric|exists:categories,id',
@@ -47,7 +49,16 @@ class DestinationController extends Controller
         try {
             $destination = new Destination();
             $destination->name = $request->name;
-            $destination->img = $request->img;
+
+            $image = $request->file('img');
+            $fileName = Str::slug($request->name) . '-' . time() . '.' . $image->getClientOriginalExtension();
+            $path = Storage::disk('public')->putFileAs('images', $image, $fileName);
+            if (!$path) {
+                return ResponseBase::error("Terjadi kesalahan upload gambar destination", 409);
+            }
+
+            $destination->img = $path;
+
             $destination->location = $request->location;
             $destination->description = $request->description;
             $destination->category_id = $request->category_id;
@@ -71,7 +82,7 @@ class DestinationController extends Controller
     {
         $rules = [
             'name' => 'nullable|string|max:255|unique:destinations,name,' . $id . ',id,category_id,' . $request->category_id,
-            'img' => 'nullable|string',
+            'img' => 'nullable|image',
             'location' => 'nullable|string',
             'description' => 'nullable|string',
             'category_id' => 'nullable|numeric|exists:categories,id',
@@ -85,7 +96,20 @@ class DestinationController extends Controller
 
         try {
             $request->filled('name') ? $destination->name = $request->name : null;
-            $request->filled('img') ? $destination->img = $request->img : null;
+
+            if($request->file('img')){
+                $image = $request->file('img');
+                $fileName = Str::slug($destination->name) . '-' . time() . '.' . $image->getClientOriginalExtension();
+                $path = Storage::disk('public')->putFileAs('images', $image, $fileName);
+                if (!$path) {
+                    return ResponseBase::error("Terjadi kesalahan upload gambar destination", 409);
+                }
+                
+                $pathOld = str_replace(asset('storage/'), '', $destination->img);
+                Storage::disk('public')->delete($pathOld);
+                $destination->img = $path;
+            }
+
             $request->filled('location') ? $destination->location = $request->location : null;
             $request->filled('description') ? $destination->description = $request->description : null;
             $request->filled('category_id') ? $destination->category_id = $request->category_id : null;
@@ -103,6 +127,8 @@ class DestinationController extends Controller
         $destination = Destination::findOrFail($id);
 
         try {
+            $pathOld = str_replace(asset('storage/'), '', $destination->img);
+            Storage::disk('public')->delete($pathOld);
             $destination->delete();
             return ResponseBase::success("Berhasil menghapus data destination");
         } catch (\Exception $e) {
