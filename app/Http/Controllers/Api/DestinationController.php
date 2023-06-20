@@ -36,7 +36,7 @@ class DestinationController extends Controller
     {
         $rules = [
             'name' => 'required|string|max:255|unique:destinations,name,NULL,id,category_id,' . $request->category_id,
-            'img' => 'required|image',
+            'img' => 'nullable|image',
             'location' => 'required|string',
             'description' => 'required|string',
             'category_id' => 'required|numeric|exists:categories,id',
@@ -50,14 +50,18 @@ class DestinationController extends Controller
             $destination = new Destination();
             $destination->name = $request->name;
 
-            $image = $request->file('img');
-            $fileName = Str::slug($request->name) . '-' . time() . '.' . $image->getClientOriginalExtension();
-            $path = Storage::disk('public')->putFileAs('images', $image, $fileName);
-            if (!$path) {
-                return ResponseBase::error("Terjadi kesalahan upload gambar destination", 409);
-            }
+            if($request->file('img')){
+                $image = $request->file('img');
+                $fileName = Str::slug($request->name) . '-' . time() . '.' . $image->getClientOriginalExtension();
+                $path = Storage::disk('public')->putFileAs('images', $image, $fileName);
+                if (!$path) {
+                    return ResponseBase::error("Terjadi kesalahan upload gambar destination", 409);
+                }
 
-            $destination->img = $path;
+                $destination->img = $path;
+            } else {
+                $destination->img = "images/bromo.jpg";
+            }
 
             $destination->location = $request->location;
             $destination->description = $request->description;

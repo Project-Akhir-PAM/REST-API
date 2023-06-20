@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('destinations', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('img');
+            $table->string('img')->nullable();
             $table->string('location');
             $table->text('description');
             $table->unsignedBigInteger('category_id');
