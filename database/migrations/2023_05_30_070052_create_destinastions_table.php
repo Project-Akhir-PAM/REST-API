@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('img')->nullable();
             $table->string('location');
             $table->text('description');
+            $table->double('longitude')->default(112.953186);
+            $table->double('latitude')->default(-7.942965);
             $table->unsignedBigInteger('category_id');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
             $table->timestamps();

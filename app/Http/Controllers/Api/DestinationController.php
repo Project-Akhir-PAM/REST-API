@@ -36,7 +36,7 @@ class DestinationController extends Controller
     {
         $rules = [
             'name' => 'required|string|max:255|unique:destinations,name,NULL,id,category_id,' . $request->category_id,
-            'img' => 'nullable|image',
+            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:1024',
             'location' => 'required|string',
             'description' => 'required|string',
             'category_id' => 'required|numeric|exists:categories,id',
@@ -86,7 +86,7 @@ class DestinationController extends Controller
     {
         $rules = [
             'name' => 'nullable|string|max:255|unique:destinations,name,' . $id . ',id,category_id,' . $request->category_id,
-            'img' => 'nullable|image',
+            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:1024',
             'location' => 'nullable|string',
             'description' => 'nullable|string',
             'category_id' => 'nullable|numeric|exists:categories,id',
