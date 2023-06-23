@@ -40,6 +40,8 @@ class DestinationController extends Controller
             'location' => 'required|string',
             'description' => 'required|string',
             'category_id' => 'required|numeric|exists:categories,id',
+            'longitude' => 'nullable',
+            'latitude' => 'nullable',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -66,6 +68,8 @@ class DestinationController extends Controller
             $destination->location = $request->location;
             $destination->description = $request->description;
             $destination->category_id = $request->category_id;
+            $request->filled('longitude') ? $destination->longitude = $request->longitude : null;
+            $request->filled('latitude') ? $destination->latitude = $request->latitude : null;
             $destination->save();
 
             return ResponseBase::success("Berhasil menambahkan data destination!", $destination);
@@ -90,6 +94,8 @@ class DestinationController extends Controller
             'location' => 'nullable|string',
             'description' => 'nullable|string',
             'category_id' => 'nullable|numeric|exists:categories,id',
+            'longitude' => 'nullable',
+            'latitude' => 'nullable',
         ];
 
         $validator = Validator::make($request->all(), $rules);
@@ -117,6 +123,8 @@ class DestinationController extends Controller
             $request->filled('location') ? $destination->location = $request->location : null;
             $request->filled('description') ? $destination->description = $request->description : null;
             $request->filled('category_id') ? $destination->category_id = $request->category_id : null;
+            $request->filled('longitude') ? $destination->longitude = $request->longitude : null;
+            $request->filled('latitude') ? $destination->latitude = $request->latitude : null;
             $destination->save();
 
             return ResponseBase::success("Berhasil update data destination", $destination);
